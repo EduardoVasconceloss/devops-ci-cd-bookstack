@@ -5,6 +5,6 @@
     - name: remove container
       shell: docker container rm devops_ci_cd
     - name: remove docker image
-      shell: docker image rm eduvasconcelos/devops_ci_cd_project                           # Nome da sua imagem docker (docker images)
+      shell: docker image rm eduvasconcelos/devops_ci_cd_jenkins                           # Nome da sua imagem docker (docker images)
     - name: create new container
-      shell: docker container run -itd --name devops_ci_cd -p 9000:80 eduvasconcelos/devops-ci-cd-jenkins    # docker-job = Nome do seu Jenkins Job
+      shell: docker container run -itd --name devops_ci_cd -p 9000:80 eduvasconcelos/devops_ci_cd_jenkins    # docker-job = Nome do seu Jenkins Job
