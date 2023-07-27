@@ -1,10 +1,10 @@
 - hosts: all
   tasks:             
-#    - name: stop container
-#      shell:  docker container stop devops_ci_cd_container                    
-#    - name: remove container
-#      shell: docker container rm devops_ci_cd_container
-#    - name: remove docker image
-#      shell: docker image rm eduvasconcelos/devops_ci_cd_jenkins            
+    - name: stop container
+      shell:  docker container stop devops_ci_cd_container                    
+    - name: remove container
+      shell: docker container rm devops_ci_cd_container
+    - name: remove docker image
+      shell: docker image rm eduvasconcelos/devops_ci_cd_jenkins            
     - name: create new container
       shell: docker container run -itd --name devopscontainer -p 9000:80 eduvasconcelos/devops_ci_cd_jenkins
