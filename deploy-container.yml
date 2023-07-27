@@ -1,7 +1,7 @@
 - hosts: all
   tasks:      
     - name: start docker-compose
-      shell: docker-compose up -d
+      shell: docker-compose -f /opt/docker-compose.yml up -d
            
 #    - name: stop container
  #     shell:  docker container stop devopscontainer                    
