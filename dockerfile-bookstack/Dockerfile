@@ -53,7 +53,7 @@ RUN \
     $HOME/.composer
 
 # copy local files
-COPY /root/dockerfile-bookstack/root/ /
+COPY root/ /
 
 # ports and volumes
 EXPOSE 80 443
