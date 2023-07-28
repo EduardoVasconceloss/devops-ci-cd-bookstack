@@ -32,7 +32,7 @@ RUN \
     $HOME/.cache
 
 # copia os arquivos locais
-COPY root/ /
+COPY ./ /
 
 # portas e volumes
 EXPOSE 3306

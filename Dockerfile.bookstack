@@ -51,7 +51,7 @@ RUN \
     $HOME/.composer
 
 # copiando os arquivos locais
-COPY root/ /
+COPY ./ /
 
 # portas e volumes
 EXPOSE 80 443
