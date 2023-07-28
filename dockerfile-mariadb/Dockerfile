@@ -34,7 +34,7 @@ RUN \
     $HOME/.cache
 
 # copy local files
-COPY root/ /
+COPY /root/dockerfile-mariadb/root/ /
 
 # ports and volumes
 EXPOSE 3306
