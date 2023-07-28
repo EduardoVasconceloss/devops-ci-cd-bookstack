@@ -21,7 +21,7 @@ services:
     depends_on:
       - bookstack_db
   bookstack_db:
-    image: lscr.io/linuxserver/mariadb
+    image: eduvasconcelos/mariadb:latest
     container_name: bookstack_db
     environment:
       - PUID=1000
