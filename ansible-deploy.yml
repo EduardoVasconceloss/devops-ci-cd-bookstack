@@ -1,0 +1,47 @@
+---
+- hosts: ansible-node
+  tasks:      
+    - name: Build Bookstack Docker image
+      command: docker image build --no-cache --pull -t bookstack:latest .
+      args:
+        chdir: /root/dockerfile-bookstack
+      
+    - name: Tag Bookstack Docker image
+      command: docker image tag bookstack:latest eduvasconcelos/bookstack:latest
+      
+    - name: Push Bookstack Docker image to DockerHub
+      command: docker image push eduvasconcelos/bookstack:latest
+
+    - name: Remove local Bookstack Docker image
+      command: docker image rmi eduvasconcelos/bookstack:latest
+
+    - name: Build MariaDB Docker image
+      command: docker image build --pull --no-cache -t mariadb:latest .
+      args:
+        chdir: /root/dockerfile-mariadb  
+
+    - name: Tag MariaDB Docker image
+      command: docker image tag mariadb:latest eduvasconcelos/mariadb:latest
+
+    - name: Push MariaDB Docker image to DockerHub
+      command: docker image push eduvasconcelos/mariadb:latest
+
+    - name: Remove local MariaDB Docker image
+      command: docker image rmi eduvasconcelos/mariadb:latest
+      
+- hosts: webapp-node
+  tasks:     
+    - name: Install Docker
+      command: ./install-docker.sh 
+      
+    - name: Start docker-compose
+      command: docker-compose -f /root/docker-compose.yml up -d
+      
+#    - name: stop container
+#      shell:  docker container stop devopscontainer                    
+#    - name: remove container
+#      shell: docker container rm devopscontainer
+#    - name: remove docker image
+#      shell: docker image rm eduvasconcelos/devops_ci_cd_jenkins            
+#    - name: create new container
+#      shell: docker container run -itd --name devopscontainer -p 9000:80 eduvasconcelos/devops_ci_cd_jenkins
