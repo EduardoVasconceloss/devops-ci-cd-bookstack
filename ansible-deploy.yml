@@ -1,5 +1,5 @@
 ---
-- hosts: ansible-node
+- hosts: localhost
   tasks:      
     - name: Build Bookstack Docker image
       command: docker image build --no-cache --pull -t bookstack:latest .
