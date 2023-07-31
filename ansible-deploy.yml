@@ -2,12 +2,12 @@
 - hosts: localhost
   tasks:      
     - name: Build Bookstack Docker image
-      command: docker image build --no-cache --pull -t bookstack:latest .
+      command: docker image build --no-cache --pull -t bookstack .
       args:
         chdir: /root/dockerfile-bookstack
       
     - name: Tag Bookstack Docker image
-      command: docker image tag bookstack:latest eduvasconcelos/bookstack:latest
+      command: docker image tag bookstack:latest 
       
     - name: Push Bookstack Docker image to DockerHub
       command: docker image push eduvasconcelos/bookstack:latest
@@ -16,12 +16,12 @@
       command: docker image rmi eduvasconcelos/bookstack:latest
 
     - name: Build MariaDB Docker image
-      command: docker image build --pull --no-cache -t mariadb:latest .
+      command: docker image build --pull --no-cache -t mariadb .
       args:
         chdir: /root/dockerfile-mariadb  
 
     - name: Tag MariaDB Docker image
-      command: docker image tag mariadb:latest eduvasconcelos/mariadb:latest
+      command: docker image tag mariadb:latest 
 
     - name: Push MariaDB Docker image to DockerHub
       command: docker image push eduvasconcelos/mariadb:latest
