@@ -31,8 +31,8 @@
       
 - hosts: webapp-node
   tasks:     
-    - name: Install Docker
-      command: ./install-docker.sh 
+#    - name: Install Docker
+#      command: ./install-docker.sh 
       
     - name: Start docker-compose
       command: docker-compose -f /root/docker-compose.yml up -d
