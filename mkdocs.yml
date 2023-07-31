@@ -1,4 +1,10 @@
 site_name: Projeto de Devops e CI/CD - Realizando o deploy de aplicações web
+site_url: https://EduardoVasconceloss.github.io/devops-ci-cd-project/
+site_author: Eduardo Vasconcelos
+site_description: >-
+  Projeto de DevOps e integração contínua/entrega contínua (CI/CD) utilizando Jenkins, Ansible, e Docker para o deploy automatizado de aplicações, incluindo Bookstack e Mariadb.
+repo_name: EduardoVasconceloss/devops-ci-cd-project
+repo_url: https://github.com/EduardoVasconceloss/devops-ci-cd-project
 theme:
   name: material
   features:
