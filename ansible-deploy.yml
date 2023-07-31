@@ -2,7 +2,7 @@
 - hosts: localhost
   tasks:      
     - name: Build Bookstack Docker image
-      command: docker image build --no-cache --pull -t bookstack .
+      command: docker image build -t bookstack .
       args:
         chdir: /root/dockerfile-bookstack
       
@@ -16,7 +16,7 @@
       command: docker image rmi eduvasconcelos/bookstack:latest
 
     - name: Build MariaDB Docker image
-      command: docker image build --pull --no-cache -t mariadb .
+      command: docker image build -t mariadb .
       args:
         chdir: /root/dockerfile-mariadb  
 
