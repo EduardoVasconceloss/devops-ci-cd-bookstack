@@ -7,13 +7,13 @@
         chdir: /root/dockerfile-bookstack
       
     - name: Tag Bookstack Docker image
-      command: docker image tag bookstack:teste
+      command: docker tag bookstack:latest eduvasconcelos/bookstack:latest
       
     - name: Push Bookstack Docker image to DockerHub
-      command: docker image push eduvasconcelos/bookstack:teste
+      command: docker image push eduvasconcelos/bookstack:latest
 
     - name: Remove local Bookstack Docker image
-      command: docker image rmi eduvasconcelos/bookstack:teste
+      command: docker image rmi eduvasconcelos/bookstack:latest
 
     - name: Build MariaDB Docker image
       command: docker image build --pull --no-cache -t mariadb .
@@ -21,13 +21,13 @@
         chdir: /root/dockerfile-mariadb  
 
     - name: Tag MariaDB Docker image
-      command: docker image tag mariadb:teste
+      command: docker tag mariadb:latest eduvasconcelos/mariadb:latest
 
     - name: Push MariaDB Docker image to DockerHub
-      command: docker image push eduvasconcelos/mariadb:teste
+      command: docker image push eduvasconcelos/mariadb
 
     - name: Remove local MariaDB Docker image
-      command: docker image rmi eduvasconcelos/mariadb:teste
+      command: docker image rmi eduvasconcelos/mariadb
       
 - hosts: webapp-node
   tasks:     
