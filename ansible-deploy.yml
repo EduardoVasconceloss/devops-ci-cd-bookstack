@@ -1,47 +1,43 @@
 ---
 - hosts: localhost
-  tasks:      
-    - name: Build Bookstack Docker image
+  tasks:
+    - name: Construindo a imagem Docker do Bookstack
       command: docker image build -t bookstack .
       args:
         chdir: /root/dockerfile-bookstack
-      
-    - name: Tag Bookstack Docker image
-      command: docker tag bookstack:latest eduvasconcelos/bookstack:latest
-      
-    - name: Push Bookstack Docker image to DockerHub
-      command: docker image push eduvasconcelos/bookstack:latest
 
-    - name: Remove local Bookstack Docker image
-      command: docker image rmi eduvasconcelos/bookstack:latest
+    - name: Etiquetando a imagem Docker do Bookstack
+      command: docker tag bookstack:latest <seu-usuario-docker>/bookstack:latest
 
-    - name: Build MariaDB Docker image
+    - name: Enviando imagem Docker do Bookstack para DockerHub
+      command: docker image push <seu-usuario-docker>/bookstack:latest
+
+    - name: Removendo a imagem Docker (local) do Bookstack
+      command: docker image rmi <seu-usuario-docker>/bookstack:latest
+
+    - name: Construindo a imagem Docker do MariaDB
       command: docker image build -t mariadb .
       args:
-        chdir: /root/dockerfile-mariadb  
+        chdir: /root/dockerfile-mariadb
 
-    - name: Tag MariaDB Docker image
-      command: docker tag mariadb:latest eduvasconcelos/mariadb:latest
+    - name: Etiquetando a imagem Docker do MariaDB
+      command: docker tag mariadb:latest <seu-usuario-docker>/mariadb:latest
 
-    - name: Push MariaDB Docker image to DockerHub
-      command: docker image push eduvasconcelos/mariadb
+    - name: Enviando a imagem Docker do MariaDB para DockerHub
+      command: docker image push <seu-usuario-docker>/mariadb
 
-    - name: Remove local MariaDB Docker image
-      command: docker image rmi eduvasconcelos/mariadb
-      
+    - name: Removendo a imagem Docker (local) do MariaDB
+      command: docker image rmi <seu-usuario-docker>/mariadb
+
 - hosts: webapp-node
-  tasks:     
-#    - name: Install Docker
-#      command: ./install-docker.sh 
-      
-    - name: Start docker-compose
+  tasks:
+    - name: Executando o docker-compose
       command: docker-compose -f /root/docker-compose.yml up -d
-      
-#    - name: stop container
-#      shell:  docker container stop devopscontainer                    
-#    - name: remove container
-#      shell: docker container rm devopscontainer
-#    - name: remove docker image
-#      shell: docker image rm eduvasconcelos/devops_ci_cd_jenkins            
-#    - name: create new container
-#      shell: docker container run -itd --name devopscontainer -p 9000:80 eduvasconcelos/devops_ci_cd_jenkins
+#    - name: Parando o container
+#      command:  docker container stop bookstack
+#    - name: Removendo o container
+#      command: docker container rm bookstack
+#    - name: Removendo a imagem docker
+#      command: docker image rm <seu-usuario-docker>/bookstack
+#    - name: Criando um container novo
+#      command: docker container run -itd --name devopscontainer -p 9000:80 <seu-usuario-docker>/bookstack

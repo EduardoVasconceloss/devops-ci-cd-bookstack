@@ -1,9 +1,9 @@
-name: ci 
+name: ci
 on:
   push:
     branches:
-      - master 
-      - main
+      - deploy-branch
+      - master
 permissions:
   contents: write
 jobs:
