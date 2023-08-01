@@ -1,8 +1,12 @@
-## Bem vindo a documentação sobre o meu projeto de Devops e CI/CD! 
+## Bem vindo a documentação sobre o meu projeto de Devops e CI/CD!
 
 Irei te ensinar como você pode instalar e fazer o "deploy" de aplicações web com Git, Jenkins, Ansible e Docker.
 
---------------------------------------------------------------------------------------------------------------------------------
+- Para facilitar a compreensão, recomendo que você analise esse diagrama que mostra como vai funcionar a comunicação entre os servidores:
+
+![diagrama do projeto](assets/projeto_devops.drawio.png)
+
+---
 
 # Configurando os servidores
 
@@ -10,16 +14,17 @@ Irei te ensinar como você pode instalar e fazer o "deploy" de aplicações web 
 
 ## Configure o arquivo hosts dos nodes
 
-No seu server, você deve declarar quem é o ansible-node, quem é o jenkins-node e quem é o webapp-node para atribuir um IP à esses nodes. 
+No seu server, você deve declarar quem é o ansible-node, quem é o jenkins-node e quem é o webapp-node para atribuir um IP à esses nodes.
 
-Para fazer isso você deve alterar o arquivo "hosts", para isso, execute o seguinte comando: ``nano /etc/hosts``
+Para fazer isso você deve alterar o arquivo "hosts", para isso, execute o seguinte comando: `nano /etc/hosts`
 
 - Agora você pode modificar o arquivo, use meu arquivo hosts como referência.
 
 ```bash
-127.0.0.1       localhost
-127.0.1.1       node1.ufba      node1  
-10.0.0.12       node2.ufba      node2
+127.0.0.1	localhost
+127.0.1.1	ansible-node
+172.24.9.81 jenkins-node
+172.24.9.80 webapp-node
 
 # The following lines are desirable for IPv6 capable hosts
 ::1     localhost ip6-localhost ip6-loopback
@@ -40,7 +45,7 @@ nano /etc/ssh/sshd_config
 PermitRootLogin yes
 ```
 
-Para aplicar as alterações feitas, reinicie sua máquina, você pode usar o comando ``sudo systemctl sshd``.
+Para aplicar as alterações feitas, reinicie sua máquina, você pode usar o comando `sudo systemctl sshd`.
 
 Para a conexão do cluster funcionar, precisamos da chave SSH. Somente assim as máquinas poderão comunicar-se entre si com segurança e agilidade. Execute o seguinte comando nos dois nodes para gerar a chave SSH:
 
@@ -49,7 +54,7 @@ ssh-keygen -t ed-25519
 # Agora é só dar enter até cansar
 ```
 
-Após isso, vamos criar um arquivo de configuração ssh nos dois nodes para automatizar a "passagem" das chaves SSH de um node para o outro. Crie um arquivo de configuração ssh com o comando ``nano ~/.ssh/config``.
+Após isso, vamos criar um arquivo de configuração ssh nos dois nodes para automatizar a "passagem" das chaves SSH de um node para o outro. Crie um arquivo de configuração ssh com o comando `nano ~/.ssh/config`.
 
 ```bash
 Host ansible-node
@@ -65,7 +70,7 @@ Host webapp-node
 # LEMBRE-SE! Mude o 'Host' e 'hostname' de acordo com sua necessidade
 ```
 
-Além disso, mude as permissões do arquivo de configuração nos dois nodes com ``chmod 600 ~/.ssh/config``.
+Além disso, mude as permissões do arquivo de configuração nos dois nodes com `chmod 600 ~/.ssh/config`.
 
 Por fim, execute esses comandos, nos três servers, para "enviar" a chave ssh de um node para o outro:
 
@@ -77,13 +82,13 @@ ssh-copy-id webapp-node
 
 > **Atenção:** Para que a chave ssh seja autenticada pelo Jenkins, em cada node, você deve acessar cada servidor manualmente via ssh, exemplo:
 >
-> ``ssh root@ansible-node``
+> `ssh root@ansible-node`
 >
-> ``ssh root@jenkins-node``
+> `ssh root@jenkins-node`
 >
-> ``ssh root@webapp-node``
+> `ssh root@webapp-node`
 
-------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 # Instalando o Jenkins no jenkins-node
 
@@ -111,8 +116,8 @@ echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
     /etc/apt/sources.list.d/jenkins.list > /dev/null
 
 sudo apt update -y
-sudo apt install -y fontconfig openjdk-17-jre-headless openjdk-17-jre 
+sudo apt install -y fontconfig openjdk-17-jre-headless openjdk-17-jre
 sudo apt install -y jenkins
 ```
 
-> **Lembre-se:** Se você optar por fazer a **2° opção**, você deve mudar as permissões do arquivo "install-jenkins.sh" com o comando ``chmod +x install-jenkins.sh``. Agora para executar o script basta executar ``./install-jenkins.sh``.
+> **Lembre-se:** Se você optar por fazer a **2° opção**, você deve mudar as permissões do arquivo "install-jenkins.sh" com o comando `chmod +x install-jenkins.sh`. Agora para executar o script basta executar `./install-jenkins.sh`.

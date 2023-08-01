@@ -90,11 +90,11 @@ No Jenkins, é possível adicionar plugins para facilitar a utilização de algu
 
 Uma tarefa serve para automatizar uma série de etapas em um pipeline de CI/CD. Essas etapas incluem o checkout do código de um repositório git, a compilação do código, a execução de testes automatizados e etc.
 
-[criando-job](assets/criando-tarefa-1.png)
+![criando-job](assets/criando-tarefa-1.png)
 
 - **1° passo:** No **"Painel de controle"** do Jenkins, clique em **"Nova tarefa"**.
 
-[criando-job2](assets/criando-tarefa-2.png)
+![criando-job2](assets/criando-tarefa-2.png)
 
 - **1° passo:** Escolha um nome para sua tarefa. Como esse projeto tem o intuito de fazer o deploy do Bookstack, eu escolhi o nome **"bookstack"** para a tarefa.
 
@@ -140,7 +140,7 @@ Agora é só clicar em **"Aplicar"** e depois clique em **"Salvar"**.
 
 - **3.1° passo:** É preciso "Construir" a nossa tarefa para que ela seja executada.
 
-[construindo a tarefa](assets/build-passo-de-construcao-1.png)
+![construindo a tarefa](assets/build-passo-de-construcao-1.png)
 
 > **Nota:** No **3° passo**, estamos enviando os arquivos do nosso repositório git para o diretório **"/root"** do servidor **"ansible-node"** e também estamos enviando os arquivos "docker-compose.yml" e "install-docker.sh" para o diretório **"/root"** do servidor **"webapp-node"**.
 
