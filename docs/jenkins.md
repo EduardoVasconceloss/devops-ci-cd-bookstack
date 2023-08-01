@@ -106,6 +106,8 @@ Uma tarefa serve para automatizar uma série de etapas em um pipeline de CI/CD. 
 
 Após criar a tarefa, falta configurará-la.
 
+---
+
 #### Adicionando o código fonte
 
 Vamos adicionar os nossos arquivos necessários para o deploy do Bookstack ao Jenkins via Git.
@@ -120,6 +122,8 @@ Vamos adicionar os nossos arquivos necessários para o deploy do Bookstack ao Je
 
 - **4° passo:** Selecione a branch do seu repositório, no meu caso é a **"main"**.
 
+---
+
 #### Enviando o código-fonte para os servidores.
 
 Os "passos de construção" em uma tarefa do Jenkins são comandos ou scripts que são executados para realizar uma parte específica do processo de construção ou implantação. Eles são a parte central de uma tarefa do Jenkins, pois definem as ações que devem ser executadas quando a tarefa é executada.
@@ -133,7 +137,7 @@ Os "passos de construção" em uma tarefa do Jenkins são comandos ou scripts qu
 - **3° passo:** No campo **"Exec command"**, cole os seguintes comandos:
 
 ```bash
-rsync -avh /var/lib/jenkins/workspace/bookstack/* root@ansible-node:/root && rsync -avh /var/lib/jenkins/workspace/bookstack/docker-compose.yml /var/lib/jenkins/workspace/bookstack/install-docker.sh root@webapp-node:/root
+rsync -avh /var/lib/jenkins/workspace/bookstack/* root@ansible-node:/root && rsync -avh /var/lib/jenkins/workspace/bookstack/docker-compose.yml root@webapp-node:/root
 ```
 
 Agora é só clicar em **"Aplicar"** e depois clique em **"Salvar"**.
@@ -142,9 +146,9 @@ Agora é só clicar em **"Aplicar"** e depois clique em **"Salvar"**.
 
 ![construindo a tarefa](assets/build-passo-de-construcao-1.png)
 
-> **Nota:** No **3° passo**, estamos enviando os arquivos do nosso repositório git para o diretório **"/root"** do servidor **"ansible-node"** e também estamos enviando os arquivos "docker-compose.yml" e "install-docker.sh" para o diretório **"/root"** do servidor **"webapp-node"**.
+> **Nota:** No **3° passo**, estamos enviando os arquivos do nosso repositório git para o diretório **"/root"** do servidor **"ansible-node"** e também estamos enviando os arquivos "docker-compose.yml" para o diretório **"/root"** do servidor **"webapp-node"**.
 
-######
+---
 
 ![passos-de-construcao-2](assets/passos-de-construcao-2.png)
 
@@ -153,50 +157,32 @@ Agora é só clicar em **"Aplicar"** e depois clique em **"Salvar"**.
 - **5° passo:** No campo **"Exec command"**, cole os seguintes comandos:
 
 ```bash
-cd /root/dockerfile-bookstack/
-
-docker image build \
-  --no-cache \
-  --pull \
-  -t $JOB_NAME:v1.$BUILD_ID .
-
-docker image tag bookstack:v1.$BUILD_ID eduvasconcelos/$JOB_NAME:v1.$BUILD_ID
-docker image tag bookstack:v1.$BUILD_ID eduvasconcelos/$JOB_NAME:latest
-docker image push eduvasconcelos/$JOB_NAME:v1.$BUILD_ID
-docker image push eduvasconcelos/$JOB_NAME:latest
-
-docker image rmi $JOB_NAME:v1.$BUILD_ID eduvasconcelos/$JOB_NAME:v1.$BUILD_ID eduvasconcelos/$JOB_NAME:latest
+cd /root
+ansible-playbook -vvv ansible-deploy.yml
 ```
 
 ![passos-de-construcao-3](assets/passos-de-construcao-3.png)
 
-- **6° passo:** Adicione mais um passo de construção e selecione o servidor **"ansible-node"**.
+- **6° passo:** No campo **"Exec timeout (ms)"**, mude o valor para **"0"**.
 
-- **7° passo:** No campo **"Exec command"**, cole os seguintes comandos:
+- **7° passo:** Aplique as alterações feitas.
 
-```bash
-cd /root/dockerfile-mariadb/
+- **8° passo:** Por fim, basta salvar sua tarefa.
 
-docker image build \
-  --pull \
-  --no-cache \
-  -t mariadb:v1.$BUILD_ID .
+---
 
-docker image tag mariadb:v1.$BUILD_ID eduvasconcelos/mariadb:v1.$BUILD_ID
-docker image tag mariadb:v1.$BUILD_ID eduvasconcelos/mariadb:latest
-docker image push eduvasconcelos/mariadb:v1.$BUILD_ID
-docker image push eduvasconcelos/mariadb:latest
+### Constuindo a tarefa criada
 
-docker image rmi mariadb:v1.$BUILD_ID eduvasconcelos/mariadb:v1.$BUILD_ID eduvasconcelos/mariadb:latest
-```
+Depois de tudo estar configurado, é hora de fazer a mágica acontercer, precisamos construir a tarefa "bookstack".
 
-![passos-de-construcao-4](assets/passos-de-construcao-4.png)
+![construindo o bookstasck](assets/construindo-bookstack.png)
 
-- **8° passo:** Adicione mais um passo de construção e selecione o servidor **"ansible-node"**.
+- **1° Passo:** Clique em **"Construir agora"** para começar a construção da tarefa.
 
-- **9° passo:** No campo **"Exec command"**, cole os seguintes comandos:
+- **2° Passo:** Perceba que a sua construção vai aparecer no canto inferior esquerdo. Clique no ícone que aparece à esquerda da "numeração" da sua tarefa.
 
-```bash
-cd /root
-ansible-playbook deploy-container.yml
-```
+Após realizar esses dois passos, você irá ver os logs da construção da sua tarefa.
+
+![construção finalizada com sucesso](assets/construcao-success.png)
+
+Se tudo correr bem, você vai ver a saída **"Finished: SUCCESS"**, isso quer dizer que a construção da tarefa foi finalizada e não foram encontrados erros durante o processo.

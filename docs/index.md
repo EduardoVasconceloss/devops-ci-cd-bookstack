@@ -26,11 +26,6 @@ Para fazer isso você deve alterar o arquivo "hosts", para isso, execute o segui
 172.24.9.81 jenkins-node
 172.24.9.80 webapp-node
 
-# The following lines are desirable for IPv6 capable hosts
-::1     localhost ip6-localhost ip6-loopback
-ff02::1 ip6-allnodes
-ff02::2 ip6-allrouters
-
 # LEMBRE-SE! Mude os IPs e os hostnames de acordo com sua necessidade, um IP e hostname que sirvam para mim podem não servir para você e vice-versa.
 ```
 
@@ -45,16 +40,16 @@ nano /etc/ssh/sshd_config
 PermitRootLogin yes
 ```
 
-Para aplicar as alterações feitas, reinicie sua máquina, você pode usar o comando `sudo systemctl sshd`.
+Para aplicar as alterações feitas, reinicie o serviço de sshd, você pode usar o comando `sudo systemctl restart sshd`
 
 Para a conexão do cluster funcionar, precisamos da chave SSH. Somente assim as máquinas poderão comunicar-se entre si com segurança e agilidade. Execute o seguinte comando nos dois nodes para gerar a chave SSH:
 
 ```bash
 ssh-keygen -t ed-25519
-# Agora é só dar enter até cansar
+# Agora é só apertar "enter" até cansar
 ```
 
-Após isso, vamos criar um arquivo de configuração ssh nos dois nodes para automatizar a "passagem" das chaves SSH de um node para o outro. Crie um arquivo de configuração ssh com o comando `nano ~/.ssh/config`.
+Após isso, vamos criar um arquivo de configuração ssh nos dois nodes para automatizar a "passagem" das chaves SSH de um node para o outro. Crie um arquivo de configuração ssh com o comando `nano ~/.ssh/config`
 
 ```bash
 Host ansible-node
@@ -70,7 +65,7 @@ Host webapp-node
 # LEMBRE-SE! Mude o 'Host' e 'hostname' de acordo com sua necessidade
 ```
 
-Além disso, mude as permissões do arquivo de configuração nos dois nodes com `chmod 600 ~/.ssh/config`.
+Além disso, mude as permissões do arquivo de configuração nos dois nodes com `chmod 600 ~/.ssh/config`
 
 Por fim, execute esses comandos, nos três servers, para "enviar" a chave ssh de um node para o outro:
 
@@ -92,17 +87,17 @@ ssh-copy-id webapp-node
 
 # Instalando o Jenkins no jenkins-node
 
-Você pode instalar o Jenkins com o script que eu disponibilizei no repositório devops-ci-cd-bookstack. Há duas maneiras que você pode ter acesso ao script.
+Você pode instalar o Jenkins com o script que eu disponibilizei no repositório [devops-ci-cd-bookstack](https://github.com/EduardoVasconceloss/devops-ci-cd-project). Há duas maneiras que você pode ter acesso ao script:
 
 - **1° Opção:** Clone o repositório para fazer o download do script.
 
-```bash
+````bash
 git clone https://github.com/EduardoVasconceloss/devops-ci-cd-bookstack.git
 cd devops-ci-cd-bookstack
 ./install-jenkins.sh
-```
+```s
 
-- **2° Opção:** Crie o arquivo do script localmente nano install-jenkins.sh e cole o código abaixo no arquivo.
+- **2° Opção:** Crie o arquivo do script localmente com o comando `nano install-jenkins.sh` e cole o código abaixo no arquivo criado.
 
 ```bash
 #!/bin/bash
@@ -118,6 +113,85 @@ echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
 sudo apt update -y
 sudo apt install -y fontconfig openjdk-17-jre-headless openjdk-17-jre
 sudo apt install -y jenkins
-```
+````
 
 > **Lembre-se:** Se você optar por fazer a **2° opção**, você deve mudar as permissões do arquivo "install-jenkins.sh" com o comando `chmod +x install-jenkins.sh`. Agora para executar o script basta executar `./install-jenkins.sh`.
+
+---
+
+# Instalando o Ansible e Docker no ansible-node
+
+> **Nota:** Você pode instalar o Ansible e o Docker com os scripts que eu disponibilizei no repositório [devops-ci-cd-bookstack](https://github.com/EduardoVasconceloss/devops-ci-cd-project).
+
+- **1° Passo:** Capture os arquivos via **"SCP"** do **jenkins-node** para o **ansible-node** e entre no diretório onde os scripts estão.
+
+```bash
+scp root@jenkins-node:/var/lib/jenkins/workspace/bookstack/install-*  /var/tmp/ && cd /var/tmp/
+```
+
+- **2° Passo:** Execute os scripts do Ansible e Docker.
+
+```bash
+# Primeiramente, execute o script do ansible
+./install-ansible.sh
+
+# Segundamente, execute o script do docker
+./install-docker.sh
+```
+
+## Configurando o Ansible e Docker no ansible-node
+
+Você deve editar o arquivo de configuração do ansible para que possamos executar o playbook sem problemas.
+
+- Acesse o diretório do ansible com o comando `cd /etc/ansible/` e altere o arquivo de configuração do ansible com o comando `nano ansible.cfg`.
+
+```bash
+# O seu "ansible.cfg" deve estar com essa configuração:
+[defaults]
+inventory = /etc/ansible/hosts
+remote_user = root
+private_key_file = /root/.ssh/id_ed25519
+```
+
+- Agora altere seu arquivo **"hosts"** para que o ansible se conecte com outros servidores.
+
+```bash
+[ansible-node]
+<IP-do-ansible-node>
+
+[jenkins-node]
+<IP-do-jenkins-node>
+
+[webapp-node]
+<IP-do-webapp-node>
+```
+
+- Por fim, faça o login com sua conta do Dockerhub para ter poder fazer o upload de suas imagens.
+
+```bash
+docker login
+```
+
+---
+
+# Instalando e configurando o Docker no webapp-node
+
+> **Nota:** Você pode instalar o Ansible e o Docker com os scripts que eu disponibilizei no repositório [devops-ci-cd-bookstack](https://github.com/EduardoVasconceloss/devops-ci-cd-project).
+
+- **1° Passo:** Capture os arquivos via **"SCP"** do **jenkins-node** para o **webapp-node** e entre no diretório onde os scripts estão.
+
+```bash
+scp root@jenkins-node:/var/lib/jenkins/workspace/bookstack/install-*  /var/tmp/ && cd /var/tmp/
+```
+
+- **2° Passo:** Execute os scripts do Docker.
+
+```bash
+./install-docker.sh
+```
+
+- **3° Passo:** Faça o login na sua conta do Dockerhub.
+
+```bash
+docker login
+```
