@@ -91,11 +91,11 @@ Você pode instalar o Jenkins com o script que eu disponibilizei no repositório
 
 - **1° Opção:** Clone o repositório para fazer o download do script.
 
-````bash
+```bash
 git clone https://github.com/EduardoVasconceloss/devops-ci-cd-bookstack.git
 cd devops-ci-cd-bookstack
 ./install-jenkins.sh
-```s
+```
 
 - **2° Opção:** Crie o arquivo do script localmente com o comando `nano install-jenkins.sh` e cole o código abaixo no arquivo criado.
 
@@ -113,7 +113,7 @@ echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
 sudo apt update -y
 sudo apt install -y fontconfig openjdk-17-jre-headless openjdk-17-jre
 sudo apt install -y jenkins
-````
+```
 
 > **Lembre-se:** Se você optar por fazer a **2° opção**, você deve mudar as permissões do arquivo "install-jenkins.sh" com o comando `chmod +x install-jenkins.sh`. Agora para executar o script basta executar `./install-jenkins.sh`.
 
