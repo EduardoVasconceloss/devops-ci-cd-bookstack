@@ -35,6 +35,6 @@ fi
 
 # Cria o arquivo hosts
 echo [ansible-node] | sudo tee /etc/ansible/hosts
-echo 172.24.9.92 | sudo tee -a /etc/ansible/hosts
+echo <ip-do-ansible-node> | sudo tee -a /etc/ansible/hosts  # Coloque o IP do ansible-node
 echo [webapp-node] | sudo tee -a /etc/ansible/hosts
-echo 172.24.9.80 | sudo tee -a /etc/ansible/hosts
+echo <ip-do-webapp-node> | sudo tee -a /etc/ansible/hosts # Coloque o IP do webapp-node
