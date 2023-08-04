@@ -45,7 +45,7 @@ Para aplicar as alterações feitas, reinicie o serviço de sshd, você pode usa
 Para a conexão do cluster funcionar, precisamos da chave SSH. Somente assim as máquinas poderão comunicar-se entre si com segurança e agilidade. Execute o seguinte comando nos dois nodes para gerar a chave SSH:
 
 ```bash
-ssh-keygen -t ed-25519
+ssh-keygen -t ed25519
 # Agora é só apertar "enter" até cansar
 ```
 
@@ -87,13 +87,13 @@ ssh-copy-id webapp-node
 
 # Instalando o Jenkins no jenkins-node
 
-Você pode instalar o Jenkins com o script que eu disponibilizei no repositório [devops-ci-cd-bookstack](https://github.com/EduardoVasconceloss/devops-ci-cd-project). Há duas maneiras que você pode ter acesso ao script:
+Você pode instalar o Jenkins com o script que eu disponibilizei no repositório [devops-ci-cd-project](https://github.com/EduardoVasconceloss/devops-ci-cd-project). Há duas maneiras que você pode ter acesso ao script:
 
 - **1° Opção:** Clone o repositório para fazer o download do script.
 
 ```bash
-git clone https://github.com/EduardoVasconceloss/devops-ci-cd-bookstack.git
-cd devops-ci-cd-bookstack
+git clone https://github.com/EduardoVasconceloss/devops-ci-cd-project.git
+cd devops-ci-cd-project
 ./install-jenkins.sh
 ```
 
@@ -115,29 +115,105 @@ sudo apt install -y fontconfig openjdk-17-jre-headless openjdk-17-jre
 sudo apt install -y jenkins
 ```
 
-> **Lembre-se:** Se você optar por fazer a **2° opção**, você deve mudar as permissões do arquivo "install-jenkins.sh" com o comando `chmod +x install-jenkins.sh`. Agora para executar o script basta executar `./install-jenkins.sh`.
+> **Lembre-se:** Se você optar por fazer a **2° opção**, você deve mudar as permissões do arquivo "install-jenkins.sh" com o comando `chmod +x install-jenkins.sh`. Agora para executar o script basta executar `./install-jenkins.sh`
 
 ---
 
 # Instalando o Ansible e Docker no ansible-node
 
-> **Nota:** Você pode instalar o Ansible e o Docker com os scripts que eu disponibilizei no repositório [devops-ci-cd-bookstack](https://github.com/EduardoVasconceloss/devops-ci-cd-project).
+> **Nota:** Você pode instalar o Ansible e o Docker com os scripts que eu disponibilizei no repositório [devops-ci-cd-project](https://github.com/EduardoVasconceloss/devops-ci-cd-project).
 
-- **1° Passo:** Capture os arquivos via **"SCP"** do **jenkins-node** para o **ansible-node** e entre no diretório onde os scripts estão.
-
-```bash
-scp root@jenkins-node:/var/lib/jenkins/workspace/bookstack/install-*  /var/tmp/ && cd /var/tmp/
-```
-
-- **2° Passo:** Execute os scripts do Ansible e Docker.
+- **1° Opção:** Clone o repositório para fazer o download do script.
 
 ```bash
-# Primeiramente, execute o script do ansible
+git clone https://github.com/EduardoVasconceloss/devops-ci-cd-project.git
+cd devops-ci-cd-project
 ./install-ansible.sh
-
-# Segundamente, execute o script do docker
 ./install-docker.sh
 ```
+
+- **2° Opção:** Crie os arquivos de script localmente com os comandos `nano install-ansible.sh` e `nano install-docker.sh`. Agora cole os códigos abaixo nos seus respectivos arquivos criados:
+
+- Script de instalação do Ansible:
+```bash
+#! /bin/bash
+
+# Atenção: esse script foi criado para instalar o ansible no Debian 12.
+
+# Atualiza os repositórios, pacotes e instala o Ansible.
+sudo apt update -y
+sudo apt install -y ansible 
+
+# Verifica a versão do Ansible instalada
+ansible --version
+
+# Verifica se o diretório /etc/ansible existe e cria caso não exista
+if [ ! -d "/etc/ansible" ] 
+then
+    sudo mkdir /etc/ansible
+fi
+
+# Verifica se o arquivo ansible.cfg existe e remove caso exista
+if [ -e "/etc/ansible/ansible.cfg" ]
+then
+    sudo rm /etc/ansible/ansible.cfg
+fi
+
+# Cria o arquivo ansible.cfg
+echo [defaults] | sudo tee /etc/ansible/ansible.cfg
+echo inventory = /etc/ansible/hosts | sudo tee -a /etc/ansible/ansible.cfg
+echo remote_user = root | sudo tee -a /etc/ansible/ansible.cfg
+echo private_key_file = /root/.ssh/id_ed25519 | sudo tee -a /etc/ansible/ansible.cfg
+
+# Verifica se o arquivo hosts existe e remove caso exista
+if [ -e "/etc/ansible/hosts" ]
+then
+    sudo rm /etc/ansible/hosts
+fi
+
+# Cria o arquivo hosts
+echo [ansible-node] | sudo tee /etc/ansible/hosts
+echo <ip-do-ansible-node> | sudo tee -a /etc/ansible/hosts  # Coloque o IP do ansible-node
+echo [webapp-node] | sudo tee -a /etc/ansible/hosts
+echo <ip-do-webapp-node> | sudo tee -a /etc/ansible/hosts # Coloque o IP do webapp-node
+```
+
+- Script de instalação do Docker:
+```bash
+#!/bin/bash
+
+# Atenção: esse script foi criado para instalar o ansible no Debian.
+
+# Atualiza os repositórios e pacotes
+sudo apt update -y
+
+# Instala dependências para permitir que o APT use repositórios HTTPS
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+
+# Adiciona a chave GPG oficial do Docker
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Configura o repositório estável do Docker
+echo "deb [signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
+
+# Atualiza os repositórios mais uma vez
+sudo apt update -y
+
+# Instala o Docker Engine
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose 
+
+# Adiciona o usuário atual ao grupo do docker para executar comandos Docker sem o "sudo"
+sudo usermod -aG docker $USER
+
+# Habilita e inicia o serviço do Docker
+sudo systemctl enable docker
+sudo systemctl start docker
+
+# Verifica a versão do Docker instalada
+docker --version
+```
+
+> **Lembre-se:** Se você optar por fazer a **2° opção**, você deve mudar as permissões dos arquivos `install-ansible.sh` e `install-docker.sh` com os comandos `chmod +x install-ansible.sh` e `chmod +x install-docker.sh`. Agora para executar os scripts basta rodar os comandos `./install-ansible.sh` e `./install-docker.sh`.
 
 ## Configurando o Ansible e Docker no ansible-node
 
@@ -176,21 +252,56 @@ docker login
 
 # Instalando e configurando o Docker no webapp-node
 
-> **Nota:** Você pode instalar o Ansible e o Docker com os scripts que eu disponibilizei no repositório [devops-ci-cd-bookstack](https://github.com/EduardoVasconceloss/devops-ci-cd-project).
+> **Nota:** Você pode instalar o Ansible e o Docker com os scripts que eu disponibilizei no repositório [devops-ci-cd-project](https://github.com/EduardoVasconceloss/devops-ci-cd-project).
 
-- **1° Passo:** Capture os arquivos via **"SCP"** do **jenkins-node** para o **webapp-node** e entre no diretório onde os scripts estão.
-
-```bash
-scp root@jenkins-node:/var/lib/jenkins/workspace/bookstack/install-*  /var/tmp/ && cd /var/tmp/
-```
-
-- **2° Passo:** Execute os scripts do Docker.
+- **1° Opção:** Clone o repositório para fazer o download do script.
 
 ```bash
+git clone https://github.com/EduardoVasconceloss/devops-ci-cd-project.git
+cd devops-ci-cd-project
 ./install-docker.sh
 ```
 
-- **3° Passo:** Faça o login na sua conta do Dockerhub.
+- **2° Opção:** Crie o arquivo do script localmente com o comando `nano install-docker.sh`. Agora cole o código abaixo nos arquivo criado:
+
+- Script de instalação do Docker:
+```bash
+#!/bin/bash
+
+# Atenção: esse script foi criado para instalar o ansible no Debian.
+
+# Atualiza os repositórios e pacotes
+sudo apt update -y
+
+# Instala dependências para permitir que o APT use repositórios HTTPS
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+
+# Adiciona a chave GPG oficial do Docker
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Configura o repositório estável do Docker
+echo "deb [signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
+
+# Atualiza os repositórios mais uma vez
+sudo apt update -y
+
+# Instala o Docker Engine
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose 
+
+# Adiciona o usuário atual ao grupo do docker para executar comandos Docker sem o "sudo"
+sudo usermod -aG docker $USER
+
+# Habilita e inicia o serviço do Docker
+sudo systemctl enable docker
+sudo systemctl start docker
+
+# Verifica a versão do Docker instalada
+docker --version
+```
+
+> **Lembre-se:** Se você optar por fazer a **2° opção**, você deve mudar as permissões do arquivo `install-docker.sh` com o comando `chmod +x install-docker.sh`. Agora para executar o script basta rodar o comando `./install-docker.sh`.
+
+- Por fim, faça o login na sua conta do Dockerhub.
 
 ```bash
 docker login
